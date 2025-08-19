@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Menu, X, Package, MapPin, Users, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,21 +20,23 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#tracking" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+            <Link to="/track" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
               Track Shipment
-            </a>
-            <a href="#services" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+            </Link>
+            <Link to="/services" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
               Services
-            </a>
-            <a href="#about" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+            </Link>
+            <Link to="/about" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
               About
-            </a>
-            <a href="#contact" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+            </Link>
+            <Link to="/contact" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
               Contact
-            </a>
-            <Button variant="logistics" size="sm">
-              Login / Sign Up
-            </Button>
+            </Link>
+            <Link to="/login">
+              <Button variant="logistics" size="sm">
+                Login / Sign Up
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -51,21 +54,23 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden py-4 border-t border-[hsl(var(--border))]">
             <div className="flex flex-col space-y-4">
-              <a href="#tracking" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+              <Link to="/track" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
                 Track Shipment
-              </a>
-              <a href="#services" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+              </Link>
+              <Link to="/services" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
                 Services
-              </a>
-              <a href="#about" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+              </Link>
+              <Link to="/about" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
                 About
-              </a>
-              <a href="#contact" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+              </Link>
+              <Link to="/contact" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
                 Contact
-              </a>
-              <Button variant="logistics" size="sm" className="w-fit">
-                Login / Sign Up
-              </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="logistics" size="sm" className="w-fit">
+                  Login / Sign Up
+                </Button>
+              </Link>
             </div>
           </div>
         )}
