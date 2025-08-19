@@ -84,11 +84,29 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'delivery-truck': {
+					'0%': { transform: 'translateX(-100px)' },
+					'25%': { transform: 'translateX(25vw)' },
+					'50%': { transform: 'translateX(50vw)' },
+					'75%': { transform: 'translateX(75vw)' },
+					'100%': { transform: 'translateX(calc(100vw + 100px))' }
+				},
+				'logistics-pulse': {
+					'0%, 100%': { opacity: '1', transform: 'scale(1)' },
+					'50%': { opacity: '0.7', transform: 'scale(1.05)' }
+				},
+				'fade-in-up': {
+					'0%': { opacity: '0', transform: 'translateY(30px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'delivery-truck': 'delivery-truck 8s ease-in-out infinite',
+				'logistics-pulse': 'logistics-pulse 2s ease-in-out infinite',
+				'fade-in-up': 'fade-in-up 0.6s ease-out forwards'
 			}
 		}
 	},
