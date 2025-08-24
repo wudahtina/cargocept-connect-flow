@@ -1,5 +1,6 @@
 import { Package, MapPin, Phone, Mail, Clock, Twitter, Linkedin, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -34,29 +35,29 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-[hsl(var(--delivery-orange))]">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <a href="#tracking" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/track" className="text-white/80 hover:text-white transition-colors">
                   Track Shipment
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#services" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/services" className="text-white/80 hover:text-white transition-colors">
                   Our Services
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#quote" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/create-shipment" className="text-white/80 hover:text-white transition-colors">
                   Get Quote
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#about" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/about" className="text-white/80 hover:text-white transition-colors">
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#careers" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/contact" className="text-white/80 hover:text-white transition-colors">
                   Careers
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -66,29 +67,29 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-[hsl(var(--delivery-orange))]">Support</h3>
             <ul className="space-y-3">
               <li>
-                <a href="#faq" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/tracking-faq" className="text-white/80 hover:text-white transition-colors">
                   FAQ
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#contact" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/contact" className="text-white/80 hover:text-white transition-colors">
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#help" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/contact" className="text-white/80 hover:text-white transition-colors">
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#shipping-guide" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/services" className="text-white/80 hover:text-white transition-colors">
                   Shipping Guide
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#claims" className="text-white/80 hover:text-white transition-colors">
+                <Link to="/contact" className="text-white/80 hover:text-white transition-colors">
                   Claims & Insurance
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -100,18 +101,18 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-[hsl(var(--delivery-orange))] mt-0.5 flex-shrink-0" />
                 <div className="text-white/80">
-                  <p>123 Logistics Avenue</p>
-                  <p>Shipping District, SD 12345</p>
-                  <p>United States</p>
+                  <p>80 Park End St, Broom Hill</p>
+                  <p>BH21 0XW</p>
+                  <p>United Kingdom</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-[hsl(var(--delivery-orange))] flex-shrink-0" />
-                <span className="text-white/80">+1 (555) 123-SHIP</span>
+                <span className="text-white/80">+44 70 8897 8089</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-[hsl(var(--delivery-orange))] flex-shrink-0" />
-                <span className="text-white/80">support@cargocept.com</span>
+                <span className="text-white/80">info@cargocept.org</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-[hsl(var(--delivery-orange))] flex-shrink-0" />

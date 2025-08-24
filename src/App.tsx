@@ -10,6 +10,7 @@ import About from "./pages/About";
 import CreateShipment from "./pages/CreateShipment";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
+import TrackingFAQ from "./pages/TrackingFAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/create-shipment" element={<CreateShipment />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/tracking-faq" element={<TrackingFAQ />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

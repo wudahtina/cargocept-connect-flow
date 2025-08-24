@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, MapPin, Package, Truck, CheckCircle, Clock, User, Phone } from "lucide-react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -276,12 +277,16 @@ const TrackShipment = () => {
               Our customer support team is available 24/7 to assist you with any tracking questions.
             </p>
             <div className="flex gap-4 justify-center">
-              <Button variant="logistics">
-                Contact Support
-              </Button>
-              <Button variant="outline" className="border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]">
-                Tracking FAQ
-              </Button>
+              <Link to="/contact">
+                <Button variant="logistics">
+                  Contact Support
+                </Button>
+              </Link>
+              <Link to="/tracking-faq">
+                <Button variant="outline" className="border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]">
+                  Tracking FAQ
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

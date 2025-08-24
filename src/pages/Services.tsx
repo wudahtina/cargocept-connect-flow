@@ -4,6 +4,11 @@ import ServicesSection from "@/components/ServicesSection";
 import { ArrowRight, Clock, Globe, Shield, Truck, Package, Ship, Bike } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import warehouseInterior from "@/assets/warehouse-interior.jpg";
+import truckFleet from "@/assets/truck-fleet.jpg";
+import cargoPlane from "@/assets/cargo-plane.jpg";
+import happyDelivery from "@/assets/happy-delivery.jpg";
 
 const Services = () => {
   const serviceDetails = [
@@ -164,12 +169,16 @@ const Services = () => {
                           )}
                         </div>
                         <div className="flex gap-3">
-                          <Button variant="logistics" className="flex-1">
-                            Get Quote
-                          </Button>
-                          <Button variant="outline" className="flex-1 border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]">
-                            Learn More
-                          </Button>
+                          <Link to="/create-shipment">
+                            <Button variant="logistics" className="flex-1">
+                              Get Quote
+                            </Button>
+                          </Link>
+                          <Link to="/contact">
+                            <Button variant="outline" className="flex-1 border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]">
+                              Learn More
+                            </Button>
+                          </Link>
                         </div>
                       </div>
                     </CardContent>
@@ -177,14 +186,17 @@ const Services = () => {
                 </div>
 
                 <div className={`fade-in-up ${index % 2 === 1 ? 'lg:col-start-1' : ''}`} style={{ animationDelay: '0.2s' }}>
-                  <div className={`h-80 rounded-lg bg-gradient-to-br ${service.bgColor} flex items-center justify-center text-white`}>
-                    <div className="text-center space-y-4">
-                      <div className="text-6xl opacity-50">
-                        {service.icon}
-                      </div>
-                      <h3 className="text-2xl font-bold">{service.title}</h3>
-                      <p className="opacity-80">Professional Service</p>
-                    </div>
+                  <div className="h-80 rounded-lg overflow-hidden">
+                    <img 
+                      src={
+                        index === 0 ? truckFleet :
+                        index === 1 ? cargoPlane :
+                        index === 2 ? happyDelivery :
+                        warehouseInterior
+                      }
+                      alt={service.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
               </div>
@@ -208,13 +220,17 @@ const Services = () => {
               world-class logistics solutions.
             </p>
             <div className="flex gap-4 justify-center">
-              <Button variant="delivery" size="lg">
-                Create Shipment
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="tracking" size="lg">
-                Contact Sales
-              </Button>
+              <Link to="/create-shipment">
+                <Button variant="delivery" size="lg">
+                  Create Shipment
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button variant="tracking" size="lg">
+                  Contact Sales
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
