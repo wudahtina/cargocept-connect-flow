@@ -8,6 +8,10 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* DHL INSPIRED COLOR PALETTE */
+    --dhl-yellow: 46 100% 50%;               /* #FFCC00 - DHL signature yellow */
+    --dhl-red: 0 84% 50%;                    /* #DC0032 - DHL signature red */
+    
     /* Logistics Blue - Trust & Reliability */
     --logistics-blue: 221 84% 35%;
     --logistics-blue-dark: 221 84% 25%;
