@@ -3,7 +3,6 @@ import { Search, Package, Truck, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import heroBanner from "@/assets/hero-banner-dhl-style.jpg";
 
 const HeroSection = () => {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -29,10 +28,10 @@ const HeroSection = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url(${heroBanner})`
+          backgroundImage: `linear-gradient(135deg, hsl(var(--logistics-blue)) 0%, hsl(var(--delivery-orange)) 100%)`
         }}
       >
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-black/20"></div>
       </div>
 
       {/* Content */}
