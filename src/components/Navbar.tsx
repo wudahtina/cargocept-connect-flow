@@ -20,6 +20,9 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+              Home
+            </Link>
             <Link to="/track" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
               Track Shipment
             </Link>
@@ -54,6 +57,9 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden py-4 border-t border-[hsl(var(--border))]">
             <div className="flex flex-col space-y-4">
+              <Link to="/" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
+                Home
+              </Link>
               <Link to="/track" className="text-[hsl(var(--professional-gray))] hover:text-[hsl(var(--logistics-blue))] transition-colors">
                 Track Shipment
               </Link>
