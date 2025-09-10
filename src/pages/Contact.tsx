@@ -283,8 +283,8 @@ const Contact = () => {
                 </div>
                 <h3 className="font-semibold text-[hsl(var(--logistics-blue))] mb-2">Emergency Shipments</h3>
                 <p className="text-sm text-[hsl(var(--professional-gray))] mb-3">Same-day delivery support</p>
-                <Button variant="outline" size="sm" className="border-[hsl(var(--delivery-orange))] text-[hsl(var(--delivery-orange))]">
-                  Call Now
+                <Button variant="outline" size="sm" className="border-[hsl(var(--delivery-orange))] text-[hsl(var(--delivery-orange))]" asChild>
+                  <a href="tel:+447088978089">Call Now</a>
                 </Button>
               </CardContent>
             </Card>
@@ -296,8 +296,8 @@ const Contact = () => {
                 </div>
                 <h3 className="font-semibold text-[hsl(var(--logistics-blue))] mb-2">General Inquiries</h3>
                 <p className="text-sm text-[hsl(var(--professional-gray))] mb-3">Questions about our services</p>
-                <Button variant="outline" size="sm" className="border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]">
-                  Email Us
+                <Button variant="outline" size="sm" className="border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]" asChild>
+                  <a href="mailto:info@cargocept.org">Email Us</a>
                 </Button>
               </CardContent>
             </Card>
