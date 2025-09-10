@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { MapPin, Clock, Package2, Truck, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatUKTime, getUKTimezone } from "@/utils/timeUtils";
 
 const LiveTrackingWidget = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -82,7 +83,7 @@ const LiveTrackingWidget = () => {
           </p>
           <div className="flex items-center justify-center text-[hsl(var(--logistics-blue))] font-mono text-sm">
             <Clock className="w-4 h-4 mr-2" />
-            {currentTime.toLocaleTimeString()} UTC
+            {formatUKTime()} {getUKTimezone()}
           </div>
         </div>
 

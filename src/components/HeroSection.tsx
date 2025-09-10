@@ -3,7 +3,7 @@ import { Search, Package, Truck, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import brandedTruck from "@/assets/branded-truck.jpg";
+import cargoceptTruck from "@/assets/cargocept-highway-truck.jpg";
 
 const HeroSection = () => {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -29,7 +29,7 @@ const HeroSection = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${brandedTruck})`
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${cargoceptTruck})`
         }}
       >
       </div>

@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import LiveTrackingWidget from "@/components/LiveTrackingWidget";
+import OperationsShowcase from "@/components/OperationsShowcase";
 import DeliveryStats from "@/components/DeliveryStats";
 import ServicesSection from "@/components/ServicesSection";
 import QuoteCalculator from "@/components/QuoteCalculator";
@@ -14,6 +15,7 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <LiveTrackingWidget />
+      <OperationsShowcase />
       <DeliveryStats />
       <ServicesSection />
       <QuoteCalculator />
