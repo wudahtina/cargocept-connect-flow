@@ -11,6 +11,7 @@ import CreateShipment from "./pages/CreateShipment";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import TrackingFAQ from "./pages/TrackingFAQ";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/tracking-faq" element={<TrackingFAQ />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
