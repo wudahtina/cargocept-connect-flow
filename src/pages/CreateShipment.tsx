@@ -42,10 +42,7 @@ const CreateShipment = () => {
     serviceType: "",
     deliveryDate: "",
     insurance: false,
-    signature: false,
-    
-    // Payment
-    paymentMethod: ""
+    signature: false
   });
 
   const updateFormData = (field: string, value: any) => {
