@@ -146,7 +146,7 @@ const CreateShipment = () => {
                   {step === 1 && "Sender Information"}
                   {step === 2 && "Recipient Information"}
                   {step === 3 && "Package Details"}
-                  {step === 4 && "Review & Payment"}
+                  {step === 4 && "Review & Invoice"}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
