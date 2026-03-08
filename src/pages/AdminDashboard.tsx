@@ -206,6 +206,7 @@ const AdminDashboard = () => {
         <Tabs defaultValue="shipments">
           <TabsList className="mb-4">
             <TabsTrigger value="shipments" className="gap-2"><Package2 className="w-4 h-4" /> Shipments</TabsTrigger>
+            <TabsTrigger value="live" className="gap-2"><Truck className="w-4 h-4" /> Live Tracking</TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2"><BarChart3 className="w-4 h-4" /> Analytics</TabsTrigger>
           </TabsList>
 
