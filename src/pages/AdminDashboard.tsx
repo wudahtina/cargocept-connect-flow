@@ -206,6 +206,7 @@ const AdminDashboard = () => {
         <Tabs defaultValue="shipments">
           <TabsList className="mb-4">
             <TabsTrigger value="shipments" className="gap-2"><Package2 className="w-4 h-4" /> Shipments</TabsTrigger>
+            <TabsTrigger value="live" className="gap-2"><Truck className="w-4 h-4" /> Live Tracking</TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2"><BarChart3 className="w-4 h-4" /> Analytics</TabsTrigger>
           </TabsList>
 
@@ -274,7 +275,78 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* ANALYTICS TAB */}
+          {/* LIVE TRACKING TAB */}
+          <TabsContent value="live" className="space-y-4">
+            <Card className="border-0 shadow-md">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                      </span>
+                      Live Shipment Monitoring
+                    </CardTitle>
+                    <CardDescription>Full visibility — update status, location, and ETA in real-time</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" className="gap-2" onClick={() => toast({ title: "Refreshed", description: "Live data synced." })}><RefreshCw className="w-4 h-4" /> Sync</Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead>Tracking #</TableHead>
+                        <TableHead>Route</TableHead>
+                        <TableHead>Service</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Current Location</TableHead>
+                        <TableHead>Progress</TableHead>
+                        <TableHead>ETA</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {shipments.filter(s => s.status !== "Cancelled" && s.status !== "Delivered").map((s) => (
+                        <TableRow key={s.id} className="group">
+                          <TableCell className="font-mono font-semibold text-[hsl(var(--logistics-blue))]">{s.trackingNumber}</TableCell>
+                          <TableCell className="text-sm">
+                            <div className="flex flex-col">
+                              <span className="font-medium">{s.senderAddress}</span>
+                              <span className="text-muted-foreground">→ {s.recipientAddress}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell><Badge variant="outline">{s.serviceType}</Badge></TableCell>
+                          <TableCell>
+                            <Select value={s.status} onValueChange={(v) => updateStatus(s.id, v as ShipmentStatus)}>
+                              <SelectTrigger className="w-[150px] h-8 border-0 p-0 shadow-none focus:ring-0">{getStatusBadge(s.status)}</SelectTrigger>
+                              <SelectContent>
+                                {statusOptions.map((opt) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell className="text-sm flex items-center gap-1"><MapPin className="w-3 h-3 text-muted-foreground" />{s.currentLocation}</TableCell>
+                          <TableCell>
+                            <div className="w-20 bg-muted rounded-full h-2">
+                              <div className="bg-gradient-to-r from-[hsl(var(--logistics-blue))] to-[hsl(var(--delivery-orange))] h-2 rounded-full" style={{ width: `${s.status === "Pending" ? 5 : s.status === "Picked Up" ? 20 : s.status === "In Transit" ? 60 : s.status === "Out for Delivery" ? 90 : 100}%` }} />
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm">{s.estimatedDelivery}</TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(s)}><Edit className="w-4 h-4" /></Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+
           <TabsContent value="analytics" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="border-0 shadow-md">
