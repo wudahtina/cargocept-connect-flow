@@ -40,5 +40,5 @@ export function getUKTimezone(): string {
   const parts = ukFormatter.formatToParts(now);
   const timeZoneName = parts.find(part => part.type === 'timeZoneName')?.value;
   
-  return timeZoneName || 'GMT';
+  return (timeZoneName || 'GMT') + ' (UK)';
 }
