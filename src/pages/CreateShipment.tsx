@@ -102,7 +102,7 @@ const CreateShipment = () => {
                 { num: 1, title: "Sender Details" },
                 { num: 2, title: "Recipient Details" },
                 { num: 3, title: "Package Info" },
-                { num: 4, title: "Payment" }
+                { num: 4, title: "Review & Confirm" }
               ].map((stepItem, index) => (
                 <div key={index} className="flex items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
