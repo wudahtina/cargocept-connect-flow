@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 const CreateShipment = () => {
   const [step, setStep] = useState(1);
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     // Sender info
     senderName: "",
