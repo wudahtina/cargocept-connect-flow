@@ -391,15 +391,21 @@ const CreateShipment = () => {
                   </div>
                 )}
 
-                {/* Step 4: Review & Payment */}
-                {step === 4 && (
+                {/* Step 4: Review & Invoice */}
+                {step === 4 && !submitted && (
                   <div className="space-y-6 fade-in-up">
                     <div className="grid lg:grid-cols-2 gap-8">
-                      {/* Order Summary */}
+                      {/* Invoice Summary */}
                       <div>
-                        <h3 className="text-lg font-semibold text-[hsl(var(--logistics-blue))] mb-4">Order Summary</h3>
+                        <h3 className="text-lg font-semibold text-[hsl(var(--logistics-blue))] mb-4 flex items-center">
+                          <FileText className="w-5 h-5 mr-2" />
+                          Invoice Summary
+                        </h3>
                         <Card className="border-[hsl(var(--logistics-blue))] border-2">
                           <CardContent className="p-6 space-y-4">
+                            <div className="text-xs text-[hsl(var(--professional-gray))] mb-2">
+                              Invoice Ref: INV-{Date.now().toString().slice(-8)}
+                            </div>
                             <div className="flex justify-between">
                               <span>Service Type:</span>
                               <span className="font-medium capitalize">{formData.serviceType?.replace('-', ' ')}</span>
@@ -430,42 +436,73 @@ const CreateShipment = () => {
                             )}
                             <div className="border-t pt-4">
                               <div className="flex justify-between text-lg font-bold text-[hsl(var(--logistics-blue))]">
-                                <span>Total:</span>
+                                <span>Estimated Total:</span>
                                 <span>£{calculatePrice()}</span>
                               </div>
+                              <p className="text-xs text-[hsl(var(--professional-gray))] mt-1">
+                                * Payment will be collected upon invoice receipt
+                              </p>
                             </div>
                           </CardContent>
                         </Card>
                       </div>
 
-                      {/* Payment Method */}
+                      {/* Shipment Details */}
                       <div>
-                        <h3 className="text-lg font-semibold text-[hsl(var(--logistics-blue))] mb-4">Payment Method</h3>
-                        <div className="space-y-4">
-                          <Select value={formData.paymentMethod} onValueChange={(value) => updateFormData('paymentMethod', value)}>
-                            <SelectTrigger className="border-[hsl(var(--logistics-blue))]">
-                              <SelectValue placeholder="Select payment method" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="card">Credit/Debit Card</SelectItem>
-                              <SelectItem value="paypal">PayPal</SelectItem>
-                              <SelectItem value="account">Company Account</SelectItem>
-                            </SelectContent>
-                          </Select>
-
-                          {formData.paymentMethod === 'card' && (
-                            <div className="space-y-4">
-                              <Input placeholder="Card Number" className="border-[hsl(var(--logistics-blue))]" />
-                              <div className="grid grid-cols-2 gap-4">
-                                <Input placeholder="MM/YY" className="border-[hsl(var(--logistics-blue))]" />
-                                <Input placeholder="CVV" className="border-[hsl(var(--logistics-blue))]" />
-                              </div>
-                              <Input placeholder="Cardholder Name" className="border-[hsl(var(--logistics-blue))]" />
+                        <h3 className="text-lg font-semibold text-[hsl(var(--logistics-blue))] mb-4">Shipment Details</h3>
+                        <Card>
+                          <CardContent className="p-6 space-y-3 text-sm">
+                            <div>
+                              <span className="font-semibold text-[hsl(var(--logistics-blue))]">Sender:</span>
+                              <p>{formData.senderName}</p>
+                              <p>{formData.senderAddress}, {formData.senderCity} {formData.senderPostcode}</p>
+                              <p>{formData.senderEmail}</p>
                             </div>
-                          )}
-                        </div>
+                            <div className="border-t pt-3">
+                              <span className="font-semibold text-[hsl(var(--logistics-blue))]">Recipient:</span>
+                              <p>{formData.recipientName}</p>
+                              <p>{formData.recipientAddress}, {formData.recipientCity} {formData.recipientPostcode}</p>
+                            </div>
+                            <div className="border-t pt-3">
+                              <span className="font-semibold text-[hsl(var(--logistics-blue))]">Package:</span>
+                              <p className="capitalize">{formData.packageType} — {formData.weight} kg</p>
+                              <p>{formData.description}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Submission Confirmation */}
+                {submitted && (
+                  <div className="text-center space-y-6 py-8 fade-in-up">
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                      <CheckCircle className="w-12 h-12 text-green-600" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[hsl(var(--logistics-blue))]">
+                      Shipment Booked Successfully!
+                    </h3>
+                    <div className="max-w-lg mx-auto space-y-3">
+                      <div className="flex items-center justify-center gap-2 text-[hsl(var(--professional-gray))]">
+                        <Mail className="w-5 h-5 text-[hsl(var(--delivery-orange))]" />
+                        <p className="text-lg">
+                          You will receive the invoice at <strong className="text-[hsl(var(--logistics-blue))]">{formData.senderEmail}</strong>
+                        </p>
+                      </div>
+                      <p className="text-[hsl(var(--professional-gray))]">
+                        Your delivery will be scheduled as soon as possible. Our team will be in touch shortly with your tracking details.
+                      </p>
+                      <div className="bg-[hsl(var(--professional-gray-lighter))] rounded-lg p-4 mt-4">
+                        <p className="text-sm text-[hsl(var(--professional-gray))]">Estimated Total</p>
+                        <p className="text-2xl font-bold text-[hsl(var(--logistics-blue))]">£{calculatePrice()}</p>
+                        <p className="text-xs text-[hsl(var(--professional-gray))] mt-1">Payable upon invoice receipt — no upfront payment required</p>
+                      </div>
+                    </div>
+                    <Button variant="logistics" size="lg" onClick={() => window.location.href = '/'}>
+                      Back to Home
+                    </Button>
                   </div>
                 )}
 
