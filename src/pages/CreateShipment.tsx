@@ -507,28 +507,30 @@ const CreateShipment = () => {
                 )}
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between pt-6 border-t border-[hsl(var(--professional-gray-light))]">
-                  <Button 
-                    variant="outline" 
-                    onClick={prevStep}
-                    disabled={step === 1}
-                    className="border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]"
-                  >
-                    Previous
-                  </Button>
-                  
-                  {step < 4 ? (
-                    <Button variant="logistics" onClick={nextStep}>
-                      Next Step
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                {!submitted && (
+                  <div className="flex justify-between pt-6 border-t border-[hsl(var(--professional-gray-light))]">
+                    <Button 
+                      variant="outline" 
+                      onClick={prevStep}
+                      disabled={step === 1}
+                      className="border-[hsl(var(--logistics-blue))] text-[hsl(var(--logistics-blue))]"
+                    >
+                      Previous
                     </Button>
-                  ) : (
-                    <Button variant="delivery" size="lg">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Create Shipment
-                    </Button>
-                  )}
-                </div>
+                    
+                    {step < 4 ? (
+                      <Button variant="logistics" onClick={nextStep}>
+                        Next Step
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button variant="delivery" size="lg" onClick={() => setSubmitted(true)}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Confirm & Send Invoice
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
