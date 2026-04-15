@@ -7,9 +7,8 @@ import Index from "./pages/Index";
 import TrackShipment from "./pages/TrackShipment";
 import Services from "./pages/Services";
 import About from "./pages/About";
-import CreateShipment from "./pages/CreateShipment";
+import BookShipment from "./pages/BookShipment";
 import Contact from "./pages/Contact";
-import Login from "./pages/Login";
 import TrackingFAQ from "./pages/TrackingFAQ";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -27,12 +26,10 @@ const App = () => (
           <Route path="/track" element={<TrackShipment />} />
           <Route path="/services" element={<Services />} />
           <Route path="/about" element={<About />} />
-          <Route path="/create-shipment" element={<CreateShipment />} />
+          <Route path="/book" element={<BookShipment />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/tracking-faq" element={<TrackingFAQ />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
