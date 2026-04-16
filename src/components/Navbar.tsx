@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Package, Search, ChevronDown, Truck, Globe, Clock, HeadphonesIcon, FileText, Building } from "lucide-react";
+import { Menu, X, Package, Search, ChevronDown, Truck, Globe, Clock, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -45,6 +45,9 @@ const Navbar = () => {
             </DropdownMenu>
 
             <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors font-medium">About</Link>
+            <Link to="/tracking-faq" className="text-muted-foreground hover:text-primary transition-colors font-medium flex items-center">
+              <HelpCircle className="mr-1 h-4 w-4" />Tracking FAQ
+            </Link>
             <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors font-medium">Contact</Link>
 
             <Link to="/track">
@@ -72,6 +75,7 @@ const Navbar = () => {
               <Link to="/services" className="text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Services</Link>
               <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>About</Link>
               <Link to="/track" className="text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Track Shipment</Link>
+              <Link to="/tracking-faq" className="text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Tracking FAQ</Link>
               <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Contact</Link>
               <Link to="/book" onClick={() => setIsOpen(false)}>
                 <Button variant="logistics" size="sm" className="w-fit">Book Shipment</Button>
