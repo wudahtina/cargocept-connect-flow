@@ -1,6 +1,10 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import LiveTrackingWidget from "@/components/LiveTrackingWidget";
+import DeliveryStats from "@/components/DeliveryStats";
 import ServicesSection from "@/components/ServicesSection";
+import OperationsShowcase from "@/components/OperationsShowcase";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ArrowRight, Shield, Clock, Globe, Truck } from "lucide-react";
@@ -55,7 +59,11 @@ const Index = () => {
         </div>
       </section>
 
+      <LiveTrackingWidget />
       <ServicesSection />
+      <DeliveryStats />
+      <OperationsShowcase />
+      <TestimonialsSection />
 
       {/* CTA */}
       <section className="py-20 bg-gradient-to-r from-primary to-accent text-white">
