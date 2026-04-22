@@ -4,17 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatUKTime, getUKTimezone } from "@/utils/timeUtils";
 
-const maskTrackingId = (id: string) => {
-  return id.slice(0, 4) + "••••" + id.slice(-3);
-};
 
-const maskLocation = (location: string) => {
-  const parts = location.split(",");
-  if (parts.length > 1) {
-    return parts[0].trim().slice(0, 3) + "•••," + parts[1];
-  }
-  return location.slice(0, 3) + "•••";
-};
 
 const LiveTrackingWidget = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -150,7 +140,7 @@ const LiveTrackingWidget = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-base text-[hsl(var(--logistics-blue))] font-mono tracking-wide">
-                      {maskTrackingId(shipment.id)}
+                      {shipment.id}
                     </CardTitle>
                     <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                       <Eye className="w-3 h-3" />
@@ -192,7 +182,7 @@ const LiveTrackingWidget = () => {
                       <MapPin className="w-3 h-3" /> Location
                     </span>
                     <span className="font-medium text-foreground">
-                      {maskLocation(shipment.location)}
+                      {shipment.location}
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2 overflow-hidden">

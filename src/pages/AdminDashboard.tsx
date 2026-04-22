@@ -18,21 +18,23 @@ import {
   MessageSquare, Inbox, Lock, Eye, EyeOff
 } from "lucide-react";
 import {
-  getShipments, saveShipments, generateTrackingNumber,
-  getBookings, saveBookings,
-  getTestimonials, saveTestimonials,
+  getShipments, createShipment, updateShipment, deleteShipment, generateTrackingNumber,
+  getBookings, updateBookingStatus,
+  getTestimonials, addTestimonial, deleteTestimonial,
   type Shipment, type ShipmentStatus, type BookingRequest, type Testimonial
 } from "@/lib/store";
+import { supabase } from "@/lib/supabase";
 
-const ADMIN_PASSWORD = "admin123";
 const statusOptions: ShipmentStatus[] = ["Pending", "Processing", "Picked Up", "In Transit", "Out for Delivery", "Delivered"];
 const bookingStatusOptions: BookingRequest["status"][] = ["New", "Contacted", "In Progress"];
 
 const AdminDashboard = () => {
   const { toast } = useToast();
   const [authenticated, setAuthenticated] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
@@ -47,7 +49,8 @@ const AdminDashboard = () => {
 
   const emptyForm = {
     trackingNumber: "", customerName: "", origin: "", destination: "",
-    status: "Pending" as ShipmentStatus, timeline: [] as Shipment["timeline"]
+    status: "Pending" as ShipmentStatus, timeline: [] as Shipment["timeline"],
+    packageDescription: "", packageType: "", packageSize: ""
   };
   const [form, setForm] = useState(emptyForm);
 
@@ -56,19 +59,70 @@ const AdminDashboard = () => {
   const [tDialogOpen, setTDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (authenticated) {
-      setShipments(getShipments());
-      setBookings(getBookings());
-      setTestimonials(getTestimonials());
-    }
-  }, [authenticated]);
+    checkUser();
+  }, []);
 
-  const handleLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-    } else {
-      toast({ title: "Access Denied", description: "Incorrect password.", variant: "destructive" });
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+      
+      if (profile?.role === "admin") {
+        setAuthenticated(true);
+        loadData();
+      }
     }
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    const [s, b, t] = await Promise.all([
+      getShipments(),
+      getBookings(),
+      getTestimonials()
+    ]);
+    setShipments(s);
+    setBookings(b);
+    setTestimonials(t);
+    setLoading(false);
+  };
+
+  const handleLogin = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      toast({ title: "Login Failed", description: error.message, variant: "destructive" });
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+    if (profile?.role === "admin") {
+      setAuthenticated(true);
+      loadData();
+    } else {
+      await supabase.auth.signOut();
+      toast({ title: "Access Denied", description: "You do not have admin privileges.", variant: "destructive" });
+    }
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setAuthenticated(false);
   };
 
   // Shipment handlers
@@ -86,86 +140,87 @@ const AdminDashboard = () => {
 
   const openEdit = (s: Shipment) => {
     setEditingShipment(s);
-    setForm({ trackingNumber: s.trackingNumber, customerName: s.customerName, origin: s.origin, destination: s.destination, status: s.status, timeline: s.timeline });
+    setForm({
+      trackingNumber: s.trackingNumber,
+      customerName: s.customerName,
+      origin: s.origin,
+      destination: s.destination,
+      status: s.status,
+      timeline: s.timeline,
+      packageDescription: s.packageDescription || "",
+      packageType: s.packageType || "",
+      packageSize: s.packageSize || ""
+    });
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.customerName || !form.origin || !form.destination) {
       toast({ title: "Missing fields", variant: "destructive" });
       return;
     }
-    const now = new Date().toISOString().split("T")[0];
+    
     if (editingShipment) {
-      const updated = shipments.map(s => s.id === editingShipment.id ? {
-        ...s, ...form, updatedAt: now,
-        timeline: form.status !== editingShipment.status
-          ? [...s.timeline, { status: form.status, date: new Date().toISOString().replace("T", " ").slice(0, 16), location: form.destination }]
-          : s.timeline
-      } : s);
-      setShipments(updated);
-      saveShipments(updated);
-      toast({ title: "Shipment updated" });
+      const success = await updateShipment(editingShipment.id, form);
+      if (success) {
+        toast({ title: "Shipment updated" });
+        loadData();
+      }
     } else {
-      const newShipment: Shipment = {
-        id: String(Date.now()), ...form, createdAt: now, updatedAt: now,
-        timeline: [{ status: "Pending", date: new Date().toISOString().replace("T", " ").slice(0, 16), location: form.origin }]
-      };
-      const updated = [newShipment, ...shipments];
-      setShipments(updated);
-      saveShipments(updated);
-      toast({ title: "Shipment created", description: form.trackingNumber });
+      const result = await createShipment(form);
+      if (result) {
+        toast({ title: "Shipment created", description: form.trackingNumber });
+        loadData();
+      }
     }
     setDialogOpen(false);
   };
 
-  const updateShipmentStatus = (id: string, status: ShipmentStatus) => {
-    const updated = shipments.map(s => {
-      if (s.id !== id) return s;
-      return {
-        ...s, status, updatedAt: new Date().toISOString().split("T")[0],
-        timeline: [...s.timeline, { status, date: new Date().toISOString().replace("T", " ").slice(0, 16), location: s.destination }]
-      };
-    });
-    setShipments(updated);
-    saveShipments(updated);
-    toast({ title: "Status updated", description: `Changed to ${status}` });
+  const updateShipmentStatusHandler = async (id: string, status: ShipmentStatus) => {
+    const success = await updateShipment(id, { status });
+    if (success) {
+      toast({ title: "Status updated", description: `Changed to ${status}` });
+      loadData();
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleteId) return;
-    const updated = shipments.filter(s => s.id !== deleteId);
-    setShipments(updated);
-    saveShipments(updated);
+    const success = await deleteShipment(deleteId);
+    if (success) {
+      toast({ title: "Shipment deleted" });
+      loadData();
+    }
     setDeleteDialogOpen(false);
-    toast({ title: "Shipment deleted" });
   };
 
   // Booking handlers
-  const updateBookingStatus = (id: string, status: BookingRequest["status"]) => {
-    const updated = bookings.map(b => b.id === id ? { ...b, status } : b);
-    setBookings(updated);
-    saveBookings(updated);
-    toast({ title: "Booking status updated" });
+  const updateBookingStatusHandler = async (id: string, status: BookingRequest["status"]) => {
+    const success = await updateBookingStatus(id, status);
+    if (success) {
+      toast({ title: "Booking status updated" });
+      loadData();
+    }
   };
 
   // Testimonial handlers
-  const handleAddTestimonial = () => {
+  const handleAddTestimonialHandler = async () => {
     if (!tForm.name || !tForm.message) return;
-    const t: Testimonial = { id: String(Date.now()), ...tForm, createdAt: new Date().toISOString().split("T")[0] };
-    const updated = [t, ...testimonials];
-    setTestimonials(updated);
-    saveTestimonials(updated);
-    setTForm({ name: "", message: "", rating: 5 });
-    setTDialogOpen(false);
-    toast({ title: "Testimonial added" });
+    const success = await addTestimonial(tForm);
+    if (success) {
+      toast({ title: "Testimonial added" });
+      loadData();
+      setTForm({ name: "", message: "", rating: 5 });
+      setTDialogOpen(false);
+    }
   };
 
-  const deleteTestimonial = (id: string) => {
-    const updated = testimonials.filter(t => t.id !== id);
-    setTestimonials(updated);
-    saveTestimonials(updated);
-    toast({ title: "Testimonial deleted" });
+  const deleteTestimonialHandler = async (id: string) => {
+    const success = await deleteTestimonial(id);
+    if (success) {
+      toast({ title: "Testimonial deleted" });
+      loadData();
+    }
   };
 
   const getStatusBadge = (status: ShipmentStatus) => {
@@ -199,22 +254,35 @@ const AdminDashboard = () => {
               <h1 className="text-2xl font-bold text-primary">Admin Access</h1>
               <p className="text-muted-foreground mt-2">Enter admin password to continue</p>
             </div>
-            <div className="space-y-2">
-              <Label>Password</Label>
-              <div className="relative">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Email</Label>
                 <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && handleLogin()}
-                  placeholder="Enter password"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="admin@cargocept.com"
                 />
-                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+              </div>
+              <div className="space-y-2">
+                <Label>Password</Label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleLogin()}
+                    placeholder="Enter password"
+                  />
+                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
-            <Button onClick={handleLogin} variant="logistics" className="w-full">Access Dashboard</Button>
+            <Button onClick={handleLogin} variant="logistics" className="w-full" disabled={loading}>
+              {loading ? "Authenticating..." : "Access Dashboard"}
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -226,9 +294,14 @@ const AdminDashboard = () => {
       <Navbar />
 
       <section className="bg-gradient-to-r from-primary to-accent text-white py-10">
-        <div className="container-logistics">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-white/80">Manage shipments, bookings, and testimonials</p>
+        <div className="container-logistics flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-white/80">Manage shipments, bookings, and testimonials</p>
+          </div>
+          <Button variant="outline" className="text-white border-white hover:bg-white/10" onClick={handleLogout}>
+            Logout
+          </Button>
         </div>
       </section>
 
@@ -298,7 +371,7 @@ const AdminDashboard = () => {
                         <TableCell className="text-sm">{s.origin}</TableCell>
                         <TableCell className="text-sm">{s.destination}</TableCell>
                         <TableCell>
-                          <Select value={s.status} onValueChange={v => updateShipmentStatus(s.id, v as ShipmentStatus)}>
+                          <Select value={s.status} onValueChange={v => updateShipmentStatusHandler(s.id, v as ShipmentStatus)}>
                             <SelectTrigger className="w-[160px] h-8 border-0 p-0 shadow-none">{getStatusBadge(s.status)}</SelectTrigger>
                             <SelectContent>{statusOptions.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}</SelectContent>
                           </Select>
@@ -343,7 +416,7 @@ const AdminDashboard = () => {
                         <TableCell className="text-sm">{b.destination}</TableCell>
                         <TableCell className="text-sm">{b.createdAt}</TableCell>
                         <TableCell>
-                          <Select value={b.status} onValueChange={v => updateBookingStatus(b.id, v as BookingRequest["status"])}>
+                          <Select value={b.status} onValueChange={v => updateBookingStatusHandler(b.id, v as BookingRequest["status"])}>
                             <SelectTrigger className="w-[130px] h-8 border-0 p-0 shadow-none">
                               <Badge className={b.status === "New" ? "bg-red-100 text-red-700" : b.status === "Contacted" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}>{b.status}</Badge>
                             </SelectTrigger>
@@ -376,7 +449,7 @@ const AdminDashboard = () => {
                           ))}
                         </div>
                       </div>
-                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteTestimonial(t.id)}>
+                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteTestimonialHandler(t.id)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
@@ -420,6 +493,18 @@ const AdminDashboard = () => {
             <div className="space-y-2">
               <Label>Destination *</Label>
               <Input value={form.destination} onChange={e => setForm(p => ({ ...p, destination: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Package Type</Label>
+              <Input placeholder="e.g. Box, Pallet, Document" value={form.packageType} onChange={e => setForm(p => ({ ...p, packageType: e.target.value }))} />
+            </div>
+            <div className="space-y-2">
+              <Label>Package Size</Label>
+              <Input placeholder="e.g. 20x20x20cm, 5kg" value={form.packageSize} onChange={e => setForm(p => ({ ...p, packageSize: e.target.value }))} />
+            </div>
+            <div className="space-y-2 col-span-2">
+              <Label>Package Description</Label>
+              <Textarea placeholder="Describe the contents of the package..." value={form.packageDescription} onChange={e => setForm(p => ({ ...p, packageDescription: e.target.value }))} rows={3} />
             </div>
           </div>
           <DialogFooter>
@@ -468,7 +553,7 @@ const AdminDashboard = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTDialogOpen(false)}>Cancel</Button>
-            <Button variant="logistics" onClick={handleAddTestimonial}>Add</Button>
+            <Button variant="logistics" onClick={handleAddTestimonialHandler}>Add</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -29,16 +29,14 @@ const TrackShipment = () => {
   const [notFound, setNotFound] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleTrack = () => {
+  const handleTrack = async () => {
     if (!trackingNumber.trim()) return;
     setIsLoading(true);
     setNotFound(false);
-    setTimeout(() => {
-      const found = getShipmentByTracking(trackingNumber.trim());
-      if (found) { setShipment(found); setNotFound(false); }
-      else { setShipment(null); setNotFound(true); }
-      setIsLoading(false);
-    }, 800);
+    const found = await getShipmentByTracking(trackingNumber.trim());
+    if (found) { setShipment(found); setNotFound(false); }
+    else { setShipment(null); setNotFound(true); }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -185,6 +183,39 @@ const TrackShipment = () => {
                       })}
                     </div>
                   </div>
+
+                  {/* Package Details */}
+                  {(shipment.packageType || shipment.packageSize || shipment.packageDescription) && (
+                    <div className="mt-8 pt-6 border-t border-border grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-foreground flex items-center gap-2">
+                          <Package className="w-4 h-4 text-primary" /> Package Information
+                        </h3>
+                        <div className="space-y-3 text-sm">
+                          {shipment.packageType && (
+                            <div className="flex justify-between border-b border-border/50 pb-2">
+                              <span className="text-muted-foreground">Type</span>
+                              <span className="font-medium">{shipment.packageType}</span>
+                            </div>
+                          )}
+                          {shipment.packageSize && (
+                            <div className="flex justify-between border-b border-border/50 pb-2">
+                              <span className="text-muted-foreground">Size/Weight</span>
+                              <span className="font-medium">{shipment.packageSize}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {shipment.packageDescription && (
+                        <div className="space-y-2">
+                          <h3 className="font-semibold text-foreground text-sm">Description</h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed bg-secondary/30 p-3 rounded-lg border border-border/50">
+                            {shipment.packageDescription}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Detailed Timeline */}
                   {shipment.timeline.length > 0 && (

@@ -48,15 +48,24 @@ const About = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [reviewForm, setReviewForm] = useState({ name: "", message: "", rating: 5 });
 
-  useEffect(() => { setTestimonials(getTestimonials()); }, []);
+  useEffect(() => {
+    const loadTestimonials = async () => {
+      const t = await getTestimonials();
+      setTestimonials(t);
+    };
+    loadTestimonials();
+  }, []);
 
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reviewForm.name || !reviewForm.message) return;
-    const t = addTestimonial(reviewForm);
-    setTestimonials(prev => [t, ...prev]);
-    setReviewForm({ name: "", message: "", rating: 5 });
-    toast({ title: "Thank you!", description: "Your testimonial has been submitted." });
+    const success = await addTestimonial(reviewForm);
+    if (success) {
+      const updated = await getTestimonials();
+      setTestimonials(updated);
+      setReviewForm({ name: "", message: "", rating: 5 });
+      toast({ title: "Thank you!", description: "Your testimonial has been submitted." });
+    }
   };
 
   return (

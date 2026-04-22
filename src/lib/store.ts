@@ -1,4 +1,4 @@
-// Shared localStorage-based store for shipments, bookings, and testimonials
+import { supabase } from "./supabase";
 
 export type ShipmentStatus = "Pending" | "Processing" | "Picked Up" | "In Transit" | "Out for Delivery" | "Delivered";
 
@@ -9,6 +9,9 @@ export interface Shipment {
   origin: string;
   destination: string;
   status: ShipmentStatus;
+  packageDescription?: string;
+  packageType?: string;
+  packageSize?: string;
   createdAt: string;
   updatedAt: string;
   timeline: { status: string; date: string; location: string }[];
@@ -35,99 +38,246 @@ export interface Testimonial {
   createdAt: string;
 }
 
-const SHIPMENTS_KEY = "cargocept_shipments";
-const BOOKINGS_KEY = "cargocept_bookings";
-const TESTIMONIALS_KEY = "cargocept_testimonials";
-
-// Default testimonials
-const defaultTestimonials: Testimonial[] = [
-  { id: "1", name: "Sarah Johnson", message: "Cargocept has revolutionized our shipping operations. Their real-time tracking and express delivery service helped us reduce delivery times by 40%.", rating: 5, createdAt: "2024-01-15" },
-  { id: "2", name: "Michael Chen", message: "The international shipping service is outstanding. Customs clearance was seamless, and our packages arrived exactly when promised.", rating: 5, createdAt: "2024-02-20" },
-  { id: "3", name: "Emily Rodriguez", message: "Same-day delivery has been a game-changer for our business. Customer satisfaction has increased dramatically since we started using Cargocept.", rating: 5, createdAt: "2024-03-10" },
-  { id: "4", name: "David Wilson", message: "Their freight and bulk transport service handles our heavy machinery shipments with care. Professional, reliable, and cost-effective.", rating: 4, createdAt: "2024-04-05" },
-];
-
-const defaultShipments: Shipment[] = [
-  {
-    id: "1", trackingNumber: "CG001287463", customerName: "John Smith", origin: "London, UK", destination: "Manchester, UK",
-    status: "In Transit", createdAt: "2025-02-25", updatedAt: "2025-02-27",
-    timeline: [
-      { status: "Pending", date: "2025-02-25 09:00", location: "London, UK" },
-      { status: "Processing", date: "2025-02-25 14:00", location: "London Depot" },
-      { status: "Picked Up", date: "2025-02-26 08:00", location: "London Hub" },
-      { status: "In Transit", date: "2025-02-27 06:00", location: "Birmingham, UK" },
-    ]
-  },
-  {
-    id: "2", trackingNumber: "CG001287464", customerName: "Acme Corp", origin: "Bristol, UK", destination: "Edinburgh, UK",
-    status: "Pending", createdAt: "2025-02-27", updatedAt: "2025-02-27",
-    timeline: [
-      { status: "Pending", date: "2025-02-27 10:00", location: "Bristol, UK" },
-    ]
-  },
-  {
-    id: "3", trackingNumber: "CG001287465", customerName: "TechFlow Ltd", origin: "Leeds, UK", destination: "Cardiff, UK",
-    status: "Out for Delivery", createdAt: "2025-02-28", updatedAt: "2025-02-28",
-    timeline: [
-      { status: "Pending", date: "2025-02-28 07:00", location: "Leeds, UK" },
-      { status: "Processing", date: "2025-02-28 08:00", location: "Leeds Depot" },
-      { status: "Picked Up", date: "2025-02-28 09:00", location: "Leeds Hub" },
-      { status: "In Transit", date: "2025-02-28 11:00", location: "M4 Corridor" },
-      { status: "Out for Delivery", date: "2025-02-28 15:00", location: "Cardiff, UK" },
-    ]
-  },
-  {
-    id: "4", trackingNumber: "CG001287466", customerName: "Global Imports", origin: "Liverpool, UK", destination: "Glasgow, UK",
-    status: "Delivered", createdAt: "2025-02-20", updatedAt: "2025-02-22",
-    timeline: [
-      { status: "Pending", date: "2025-02-20 09:00", location: "Liverpool, UK" },
-      { status: "Processing", date: "2025-02-20 11:00", location: "Liverpool Depot" },
-      { status: "Picked Up", date: "2025-02-20 14:00", location: "Liverpool Hub" },
-      { status: "In Transit", date: "2025-02-21 06:00", location: "M6 Motorway" },
-      { status: "Out for Delivery", date: "2025-02-22 08:00", location: "Glasgow, UK" },
-      { status: "Delivered", date: "2025-02-22 11:00", location: "Glasgow, UK" },
-    ]
-  },
-];
-
-function getFromStorage<T>(key: string, defaults: T[]): T[] {
-  try {
-    const data = localStorage.getItem(key);
-    if (data) return JSON.parse(data);
-  } catch {}
-  return defaults;
-}
-
-function saveToStorage<T>(key: string, data: T[]) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
 // Shipments
-export function getShipments(): Shipment[] { return getFromStorage(SHIPMENTS_KEY, defaultShipments); }
-export function saveShipments(s: Shipment[]) { saveToStorage(SHIPMENTS_KEY, s); }
-export function getShipmentByTracking(trackingNumber: string): Shipment | undefined {
-  return getShipments().find(s => s.trackingNumber.toLowerCase() === trackingNumber.toLowerCase());
+export async function getShipments(): Promise<Shipment[]> {
+  const { data, error } = await supabase
+    .from("shipments")
+    .select(`
+      *,
+      timeline:shipment_timeline(status, date, location)
+    `)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching shipments:", error);
+    return [];
+  }
+
+  return (data || []).map(s => ({
+    id: s.id,
+    trackingNumber: s.tracking_number,
+    customerName: s.customer_name,
+    origin: s.origin,
+    destination: s.destination,
+    status: s.status as ShipmentStatus,
+    packageDescription: s.package_description,
+    packageType: s.package_type,
+    packageSize: s.package_size,
+    createdAt: s.created_at,
+    updatedAt: s.updated_at,
+    timeline: s.timeline || []
+  }));
 }
-export function generateTrackingNumber(): string { return `CG${String(Date.now()).slice(-9)}`; }
+
+export async function getShipmentByTracking(trackingNumber: string): Promise<Shipment | undefined> {
+  const { data, error } = await supabase
+    .from("shipments")
+    .select(`
+      *,
+      timeline:shipment_timeline(status, date, location)
+    `)
+    .eq("tracking_number", trackingNumber)
+    .single();
+
+  if (error) {
+    console.error("Error fetching shipment by tracking:", error);
+    return undefined;
+  }
+
+  return {
+    id: data.id,
+    trackingNumber: data.tracking_number,
+    customerName: data.customer_name,
+    origin: data.origin,
+    destination: data.destination,
+    status: data.status as ShipmentStatus,
+    packageDescription: data.package_description,
+    packageType: data.package_type,
+    packageSize: data.package_size,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    timeline: data.timeline || []
+  };
+}
+
+export function generateTrackingNumber(): string {
+  return `CG${String(Date.now()).slice(-9)}`;
+}
+
+export async function createShipment(s: Omit<Shipment, "id" | "createdAt" | "updatedAt" | "timeline">): Promise<Shipment | null> {
+  const { data: shipment, error: sError } = await supabase
+    .from("shipments")
+    .insert({
+      tracking_number: s.trackingNumber,
+      customer_name: s.customerName,
+      origin: s.origin,
+      destination: s.destination,
+      status: s.status,
+      package_description: s.packageDescription,
+      package_type: s.packageType,
+      package_size: s.packageSize
+    })
+    .select()
+    .single();
+
+  if (sError) {
+    console.error("Error creating shipment:", sError);
+    return null;
+  }
+
+  // Add initial timeline entry
+  const { error: tError } = await supabase
+    .from("shipment_timeline")
+    .insert({
+      shipment_id: shipment.id,
+      status: s.status,
+      location: s.origin
+    });
+
+  if (tError) {
+    console.error("Error creating initial timeline entry:", tError);
+  }
+
+  return getShipmentByTracking(s.trackingNumber);
+}
+
+export async function updateShipment(id: string, s: Partial<Shipment>): Promise<boolean> {
+  const updateData: any = {};
+  if (s.customerName) updateData.customer_name = s.customerName;
+  if (s.origin) updateData.origin = s.origin;
+  if (s.destination) updateData.destination = s.destination;
+  if (s.status) updateData.status = s.status;
+  if (s.packageDescription !== undefined) updateData.package_description = s.packageDescription;
+  if (s.packageType !== undefined) updateData.package_type = s.packageType;
+  if (s.packageSize !== undefined) updateData.package_size = s.packageSize;
+
+  const { error } = await supabase
+    .from("shipments")
+    .update(updateData)
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating shipment:", error);
+    return false;
+  }
+
+  // If status changed, add to timeline
+  if (s.status) {
+    const { error: tError } = await supabase
+      .from("shipment_timeline")
+      .insert({
+        shipment_id: id,
+        status: s.status,
+        location: s.destination || "" // Using destination as location for status updates
+      });
+    if (tError) console.error("Error adding timeline entry:", tError);
+  }
+
+  return true;
+}
+
+export async function deleteShipment(id: string): Promise<boolean> {
+  const { error } = await supabase.from("shipments").delete().eq("id", id);
+  if (error) {
+    console.error("Error deleting shipment:", error);
+    return false;
+  }
+  return true;
+}
 
 // Bookings
-export function getBookings(): BookingRequest[] { return getFromStorage(BOOKINGS_KEY, []); }
-export function saveBookings(b: BookingRequest[]) { saveToStorage(BOOKINGS_KEY, b); }
-export function addBooking(b: Omit<BookingRequest, "id" | "status" | "createdAt">): BookingRequest {
-  const bookings = getBookings();
-  const newBooking: BookingRequest = { ...b, id: String(Date.now()), status: "New", createdAt: new Date().toISOString().split("T")[0] };
-  bookings.unshift(newBooking);
-  saveBookings(bookings);
-  return newBooking;
+export async function getBookings(): Promise<BookingRequest[]> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching bookings:", error);
+    return [];
+  }
+
+  return (data || []).map(b => ({
+    id: b.id,
+    fullName: b.full_name,
+    email: b.email,
+    phone: b.phone,
+    pickupLocation: b.pickup_location,
+    destination: b.destination,
+    packageDetails: b.package_details,
+    notes: b.notes,
+    status: b.status as any,
+    createdAt: b.created_at
+  }));
+}
+
+export async function addBooking(b: Omit<BookingRequest, "id" | "status" | "createdAt">): Promise<boolean> {
+  const { error } = await supabase.from("bookings").insert({
+    full_name: b.fullName,
+    email: b.email,
+    phone: b.phone,
+    pickup_location: b.pickupLocation,
+    destination: b.destination,
+    package_details: b.packageDetails,
+    notes: b.notes
+  });
+
+  if (error) {
+    console.error("Error adding booking:", error);
+    return false;
+  }
+  return true;
+}
+
+export async function updateBookingStatus(id: string, status: BookingRequest["status"]): Promise<boolean> {
+  const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+  if (error) {
+    console.error("Error updating booking status:", error);
+    return false;
+  }
+  return true;
 }
 
 // Testimonials
-export function getTestimonials(): Testimonial[] { return getFromStorage(TESTIMONIALS_KEY, defaultTestimonials); }
-export function saveTestimonials(t: Testimonial[]) { saveToStorage(TESTIMONIALS_KEY, t); }
-export function addTestimonial(t: Omit<Testimonial, "id" | "createdAt">): Testimonial {
-  const testimonials = getTestimonials();
-  const newT: Testimonial = { ...t, id: String(Date.now()), createdAt: new Date().toISOString().split("T")[0] };
-  testimonials.unshift(newT);
-  saveTestimonials(testimonials);
-  return newT;
+export async function getTestimonials(): Promise<Testimonial[]> {
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching testimonials:", error);
+    return [];
+  }
+
+  return (data || []).map(t => ({
+    id: t.id,
+    name: t.name,
+    message: t.message,
+    rating: t.rating,
+    createdAt: t.created_at
+  }));
+}
+
+export async function addTestimonial(t: Omit<Testimonial, "id" | "createdAt">): Promise<boolean> {
+  const { error } = await supabase.from("testimonials").insert({
+    name: t.name,
+    message: t.message,
+    rating: t.rating
+  });
+
+  if (error) {
+    console.error("Error adding testimonial:", error);
+    return false;
+  }
+  return true;
+}
+
+export async function deleteTestimonial(id: string): Promise<boolean> {
+  const { error } = await supabase.from("testimonials").delete().eq("id", id);
+  if (error) {
+    console.error("Error deleting testimonial:", error);
+    return false;
+  }
+  return true;
 }

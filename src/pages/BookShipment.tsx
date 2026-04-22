@@ -24,11 +24,11 @@ const BookShipment = () => {
 
   const update = (field: string, value: string) => setForm(p => ({ ...p, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.fullName || !form.email || !form.phone || !form.pickupLocation || !form.destination || !form.packageDetails) return;
-    addBooking(form);
-    setSubmitted(true);
+    const success = await addBooking(form);
+    if (success) setSubmitted(true);
   };
 
   return (
